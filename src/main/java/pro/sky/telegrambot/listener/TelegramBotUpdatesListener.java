@@ -5,8 +5,8 @@ import com.pengrad.telegrambot.UpdatesListener;
 import com.pengrad.telegrambot.model.Update;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import pro.sky.telegrambot.services.interfaces.BotService;
 
 import javax.annotation.PostConstruct;
 import java.util.List;
@@ -14,10 +14,14 @@ import java.util.List;
 @Service
 public class TelegramBotUpdatesListener implements UpdatesListener {
 
-    private Logger logger = LoggerFactory.getLogger(TelegramBotUpdatesListener.class);
+    private final Logger logger = LoggerFactory.getLogger(TelegramBotUpdatesListener.class);
+    private final TelegramBot telegramBot;
+    private final BotService botService;
 
-    @Autowired
-    private TelegramBot telegramBot;
+    public TelegramBotUpdatesListener(TelegramBot telegramBot, BotService botService) {
+        this.telegramBot = telegramBot;
+        this.botService = botService;
+    }
 
     @PostConstruct
     public void init() {
@@ -29,8 +33,15 @@ public class TelegramBotUpdatesListener implements UpdatesListener {
         updates.forEach(update -> {
             logger.info("Processing update: {}", update);
             // Process your updates here
+            if (update.message().text().equals("/start")) {
+                botService.sayHello(update.message().chat().id());
+            }
+
+            else if (update.message().text().startsWith("/add ")) {
+                botService.addTask(update.message());
+            }
+
         });
         return UpdatesListener.CONFIRMED_UPDATES_ALL;
     }
-
 }
