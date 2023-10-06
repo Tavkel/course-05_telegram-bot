@@ -36,6 +36,11 @@ public class TelegramBotUpdatesListener implements UpdatesListener {
             if (update.message().text().equals("/start")) {
                 botService.sayHello(update.message().chat().id());
             }
+
+            else if (update.message().text().startsWith("/add ")) {
+                botService.addTask(update.message());
+            }
+
         });
         return UpdatesListener.CONFIRMED_UPDATES_ALL;
     }
